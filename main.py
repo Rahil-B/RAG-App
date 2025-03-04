@@ -3,8 +3,8 @@ import streamlit as st
 from utils.pdf_utils import extract_text_from_pdf, chunk_text
 from utils.reddit_utils import fetch_reddit_posts
 from utils.embedding_utils import load_embedding_model, load_sentence_transformer, add_documents_to_collection, query_chroma
-from utils.llm_utils import generate_response, groundness_func, answer_relevance_func, context_relevance_func, cosine_similarity_func, perplexity_score
-from utils.analysis_utils import calculate_toxicity, calculate_sentiment, rouge_score, bias_score_func, detect_pii, visualize_toxicity
+from utils.llm_utils import generate_response, groundness_func, answer_relevance_func, context_relevance_func, cosine_similarity_func, perplexity_score,detect_hallucination
+from utils.analysis_utils import Neutrality_viz, answer_relevance, calculate_toxicity, calculate_sentiment, context_relevance, rouge_score, bias_score_func, detect_pii, visualize_groundness, visualize_toxicity
 
 st.title("Responsible AI RAG System")
 
@@ -71,18 +71,23 @@ if st.session_state.answer_generated:
         cosine_similarity_score = cosine_similarity_func(question, response)
         pii = detect_pii(response)
         
-        st.subheader("Responsible AI Analysis")
+        st.header("Responsible AI Analysis")
         visualize_toxicity(toxicity_score)
         st.write(f"**Toxicity Score:** {toxicity_score}")
-        st.write(f"**Hallucination:** {'No Hallucination' if cosine_similarity_score > 0.4 else 'Hallucinated'}")
-        st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")        
+        # st.write(f"**Hallucination:** {'No Hallucination' if cosine_similarity_score > 0.4 else 'Hallucinated'}")
+        detect_hallucination(question, response)
+        st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")  
+        visualize_groundness(groundness_score)      
         st.write(f"**Groundness Score:** {groundness_score}")
+        answer_relevance(answer_relevance_score)
         st.write(f"**Answer Relevance Score:** {answer_relevance_score}")
+        context_relevance(context_relevance_score)
         st.write(f"**Context Relevance Score:** {context_relevance_score}")
+        Neutrality_viz(sentiment_scores['neutrality'])
         st.write(f"**Neutrality:** {sentiment_scores['neutrality']}")
         st.write(f"**Subjectivity:** {sentiment_scores['subjectivity']}")
         st.write(f"**Polarity:** {sentiment_scores['polarity']}")
         st.write(f"**PII Detection:** {pii}")
         st.write(f"**ROUGE Score:** {rouge_scores}")        
         st.write(f"**Perplexity Score:** {perplexity_scores}")
-        st.write(f"**Bias Score:** {bias_score}")
+        #st.write(f"**Bias Score:** {bias_score}")

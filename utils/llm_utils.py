@@ -7,6 +7,7 @@ import torch
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from config import GROQ_API_KEY
+import streamlit as st
 
 # Initialize GPT2 resources (for perplexity)
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
@@ -74,6 +75,16 @@ def cosine_similarity_func(question, response):
     response_embedding = model.encode([response])
     cosine_sim = cosine_similarity(query_embedding, response_embedding)
     return cosine_sim[0][0]
+
+def detect_hallucination(question, response):
+    st.subheader("hallucinations detection")
+    cosine_sim_score = cosine_similarity_func(question, response)
+    if cosine_sim_score > 0.4:
+        st.success("✅ No Hallucination")
+        return "No Hallucination"
+    else:
+        st.error("🚨 Hallucinated")
+        return "Hallucinated"
 
 def perplexity_score(text):
     inputs = tokenizer(text, return_tensors="pt")
