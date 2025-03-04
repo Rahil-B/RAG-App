@@ -7,11 +7,39 @@ from rouge import Rouge
 from detoxify import Detoxify
 from presidio_analyzer import AnalyzerEngine
 from Dbias.bias_classification import classifier
+import requests
 
 rouge = Rouge()
 
-def calculate_toxicity(response):
-    return Detoxify("original").predict(response)
+# def calculate_toxicity(response):
+#     return Detoxify("original").predict(response)
+API_KEY = "AIzaSyAaiBWopGwFvYW4Poc-MdjZMz5bgbHQzCQ"  # Replace with your actual API key
+
+# Google Perspective API endpoint
+url = f"https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={API_KEY}"
+
+def calculate_toxicity_func(text):
+    """Moderates text using Google Perspective API."""
+    data = {
+        "comment": {"text": text},
+        "languages": ["en"],
+        "requestedAttributes": {
+            "TOXICITY": {},  # Main moderation category
+            "SEVERE_TOXICITY": {},
+            "INSULT": {},
+            "THREAT": {},
+            "IDENTITY_ATTACK": {},
+            "SEXUALLY_EXPLICIT": {}
+        }
+    }
+
+    response = requests.post(url, json=data)
+    
+    if response.status_code == 200:
+        scores = response.json().get("attributeScores", {})
+        return {attr: scores[attr]["summaryScore"]["value"] for attr in scores}
+    else:
+        return {"error": f"API Error: {response.status_code}"}
 
 def calculate_sentiment(text):
     sia = SentimentIntensityAnalyzer()
