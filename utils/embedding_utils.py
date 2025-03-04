@@ -13,7 +13,7 @@ def load_embedding_model():
 @st.cache_resource
 def load_sentence_transformer():
     return SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
-
+@st.cache_resource
 def get_chroma_collection():
     client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
     collection = client.get_or_create_collection(

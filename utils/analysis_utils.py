@@ -7,14 +7,23 @@ from rouge import Rouge
 from detoxify import Detoxify
 from presidio_analyzer import AnalyzerEngine
 from Dbias.bias_classification import classifier
-
-rouge = Rouge()
-
+@st.cache_resource
+def get_rouge():
+    return Rouge()
+#rouge = Rouge()
+@st.cache_resource
+def get_sia():
+    return SentimentIntensityAnalyzer()
+#sia = SentimentIntensityAnalyzer()
+@st.cache_resource
+def get_engine():
+    return AnalyzerEngine()
+#engine = AnalyzerEngine()
 def calculate_toxicity(response):
     return Detoxify("original").predict(response)
 
 def calculate_sentiment(text):
-    sia = SentimentIntensityAnalyzer()
+    sia=get_sia()
     sentiment_scores = sia.polarity_scores(text)
     return {
         'neutrality': sentiment_scores['neu'],
@@ -23,6 +32,7 @@ def calculate_sentiment(text):
     }
 
 def rouge_score(response, context):
+    rouge=get_rouge()
     scores = rouge.get_scores(response, context)
     return scores[0]["rouge-1"]["f"]
 
@@ -30,7 +40,7 @@ def bias_score_func(response):
     return classifier(response)
 
 def detect_pii(response):
-    engine = AnalyzerEngine()
+    engine=get_engine()
     results = engine.analyze(
         text=response,
         entities=["PERSON", "EMAIL_ADDRESS", "PHONE_NUMBER", "CREDIT_CARD", "IBAN", "URL", "LOCATION", "IP_ADDRESS"],
