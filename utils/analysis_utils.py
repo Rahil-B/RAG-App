@@ -75,11 +75,11 @@ def visualize_toxicity(toxicity_score):
     toxicity_values = list(toxicity_score.values())
 
     st.subheader("Toxicity Score Visualization")
-    fig, ax = plt.subplots()
-    ax.barh(toxicity_labels, toxicity_values, color=['green', 'yellow', 'orange', 'red', 'gray'])
-    ax.set_xlabel("Toxicity Level")
-    ax.set_title("Toxicity Analysis")
-    st.pyplot(fig)
+    # fig, ax = plt.subplots()
+    # ax.barh(toxicity_labels, toxicity_values, color=['green', 'yellow', 'orange', 'red', 'gray'])
+    # ax.set_xlabel("Toxicity Level")
+    # ax.set_title("Toxicity Analysis")
+    # st.pyplot(fig)
 
     max_toxicity = max(toxicity_values)
     if max_toxicity < 0.05:
