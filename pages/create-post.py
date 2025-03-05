@@ -14,7 +14,7 @@ from utils.embedding_utils import (
 from utils.web_page import fetch_data_from_urls
 from utils.llm_utils import (
     detect_hallucination, generate_response, groundness_func, answer_relevance_func, 
-    context_relevance_func, cosine_similarity_func, perplexity_score
+    context_relevance_func, cosine_similarity_func, moderate_response, perplexity_score
 )
 
 
@@ -86,10 +86,16 @@ if st.session_state.get("answer_generated") and question:
             bias_score = bias_score_func(response)
             cosine_similarity_score = cosine_similarity_func(question, response)
             pii = detect_pii(response)
+            if(toxicity_score>0.1):
+                   moderated_response = moderate_response(question,response)
             
             st.header("Responsible AI Analysis")
             visualize_toxicity(toxicity_score)
             st.write(f"**Toxicity Score:** {toxicity_score}")
+
+            st.subheader("Moderated Response")
+            st.write(moderated_response)
+
             # st.write(f"**Hallucination:** {'No Hallucination' if cosine_similarity_score > 0.4 else 'Hallucinated'}")
             detect_hallucination(question, response)
             st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")  

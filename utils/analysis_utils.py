@@ -95,12 +95,14 @@ def visualize_toxicity(toxicity_score):
     # st.pyplot(fig)
 
     max_toxicity = max(toxicity_values)
-    if max_toxicity < 0.05:
+    if max_toxicity < 0.1:
         st.success("✅ Low Toxicity")
-    elif max_toxicity < 0.1:
+    elif max_toxicity < 0.5:
         st.warning("⚠️ Moderate Toxicity")
     else:
         st.error("🚨 High Toxicity")
+        
+
 
 
 def visualize_groundness(groundness_score):
