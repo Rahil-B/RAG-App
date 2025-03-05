@@ -8,6 +8,7 @@ import torch
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from config import GROQ_API_KEY
+import streamlit as st
 
 @st.cache_resource
 def get_tokenizer():
@@ -28,10 +29,43 @@ model_embed = get_model_embed()#SentenceTransformer('all-MiniLM-L6-v2')
 # Initialize ChatGroq LLM
 llm = ChatGroq(model="llama3-8b-8192", api_key=GROQ_API_KEY)
 
+# def generate_response(question, context):
+#     prompt = f"Context: {context}\nQuestion: {question}\nAnswer strictly based on the given context."
+#     response = ollama.chat(model="llama2-uncensored", messages=[{"role": "user", "content": prompt}])
+#     return response["message"]["content"]
+
 def generate_response(question, context):
-    prompt = f"Context: {context}\nQuestion: {question}\nAnswer strictly based on the given context."
-    response = ollama.chat(model="llama2-uncensored", messages=[{"role": "user", "content": prompt}])
+    # prompt = f"Context: {context}\nQuestion: {question}\nAnswer strictly based on the given context."
+    prompt = [
+    {"role": "system", "content": """A user will give you a context, and you must generate a high-quality, engaging social media post strictly based on that context.
+    
+    - **Do not add any information that is not present in the context.**
+    - Ensure that the post is relevant, engaging, and formatted for online posting.
+    - Add **4-6 relevant hashtags** to increase engagement.
+    - Use a **conversational and catchy tone** while maintaining factual accuracy.
+    - If the context is missing or lacks enough information, say **'Sorry, no relevant context provided'** instead of generating a post."""},    
+    {"role": "user", "content": "Context: " + str(context) + " question: " + str(question)}
+    ]
+    # response = ollama.chat(model="mistral", messages=prompt)
+    response = ollama.chat(model="mistral", messages=prompt)
     return response["message"]["content"]
+
+def generate_moderated_response(question, context):
+    # prompt = f"Context: {context}\nQuestion: {question}\nAnswer strictly based on the given context."
+    prompt = [
+    {"role": "system", "content": """A user will give you a context, and you must generate a high-quality, engaging social media post strictly based on that context.
+    
+    - **Do not add any information that is not present in the context.**
+    - Ensure that the post is relevant, engaging, and formatted for online posting.
+    - Add **4-6 relevant hashtags** to increase engagement.
+    - Use a **conversational and catchy tone** while maintaining factual accuracy.
+    - If the context is missing or lacks enough information, say **'Sorry, no relevant context provided'** instead of generating a post."""},    
+    {"role": "user", "content": "Context: " + str(context) + " question: " + str(question)}
+    ]
+    # response = ollama.chat(model="mistral", messages=prompt)
+    response = ollama.chat(model="mistral", messages=prompt)
+    return response["message"]["content"]
+
 
 def groundness_func(context, response):
     prompt = [
@@ -70,6 +104,16 @@ def cosine_similarity_func(question, response):
     response_embedding = model_embed.encode([response])
     cosine_sim = cosine_similarity(query_embedding, response_embedding)
     return cosine_sim[0][0]
+
+def detect_hallucination(question, response):
+    st.subheader("hallucinations detection")
+    cosine_sim_score = cosine_similarity_func(question, response)
+    if cosine_sim_score > 0.4:
+        st.success("✅ No Hallucination")
+        return "No Hallucination"
+    else:
+        st.error("🚨 Hallucinated")
+        return "Hallucinated"
 
 def perplexity_score(text):
     inputs = tokenizer(text, return_tensors="pt")

@@ -7,6 +7,9 @@ from rouge import Rouge
 from detoxify import Detoxify
 from presidio_analyzer import AnalyzerEngine
 from Dbias.bias_classification import classifier
+import requests
+from sklearn.metrics.pairwise import cosine_similarity
+
 @st.cache_resource
 def get_rouge():
     return Rouge()
@@ -18,9 +21,37 @@ def get_sia():
 @st.cache_resource
 def get_engine():
     return AnalyzerEngine()
-#engine = AnalyzerEngine()
-def calculate_toxicity(response):
-    return Detoxify("original").predict(response)
+
+# rouge = Rouge()
+
+
+API_KEY = "AIzaSyAaiBWopGwFvYW4Poc-MdjZMz5bgbHQzCQ"  # Replace with your actual API key
+
+# Google Perspective API endpoint
+url = f"https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={API_KEY}"
+
+def calculate_toxicity(text):
+    """Moderates text using Google Perspective API."""
+    data = {
+        "comment": {"text": text},
+        "languages": ["en"],
+        "requestedAttributes": {
+            "TOXICITY": {},  # Main moderation category
+            "SEVERE_TOXICITY": {},
+            "INSULT": {},
+            "THREAT": {},
+            "IDENTITY_ATTACK": {},
+            "SEXUALLY_EXPLICIT": {}
+        }
+    }
+
+    response = requests.post(url, json=data)
+    
+    if response.status_code == 200:
+        scores = response.json().get("attributeScores", {})
+        return {attr: scores[attr]["summaryScore"]["value"] for attr in scores}
+    else:
+        return {"error": f"API Error: {response.status_code}"}
 
 def calculate_sentiment(text):
     sia=get_sia()
@@ -57,11 +88,11 @@ def visualize_toxicity(toxicity_score):
     toxicity_values = list(toxicity_score.values())
 
     st.subheader("Toxicity Score Visualization")
-    fig, ax = plt.subplots()
-    ax.barh(toxicity_labels, toxicity_values, color=['green', 'yellow', 'orange', 'red', 'gray'])
-    ax.set_xlabel("Toxicity Level")
-    ax.set_title("Toxicity Analysis")
-    st.pyplot(fig)
+    # fig, ax = plt.subplots()
+    # ax.barh(toxicity_labels, toxicity_values, color=['green', 'yellow', 'orange', 'red', 'gray'])
+    # ax.set_xlabel("Toxicity Level")
+    # ax.set_title("Toxicity Analysis")
+    # st.pyplot(fig)
 
     max_toxicity = max(toxicity_values)
     if max_toxicity < 0.05:
@@ -70,3 +101,60 @@ def visualize_toxicity(toxicity_score):
         st.warning("⚠️ Moderate Toxicity")
     else:
         st.error("🚨 High Toxicity")
+
+
+def visualize_groundness(groundness_score):
+    st.subheader("groundness detection")
+    if float(groundness_score) > 0.7:
+        st.success("✅ Grounded")
+    elif float(groundness_score)  == 0.0:
+        st.warning("⚠️ No Context was provided for this response")
+    else:
+        st.error("🚨 Ungrounded")
+
+def answer_relevance(answer_relevance_score):
+    st.subheader("Answer Relevance Detection")
+    if float(answer_relevance_score) > 0.7:
+        st.success("✅ Answer is strongly Relevant")
+    elif float(answer_relevance_score) > 0.5 and float(answer_relevance_score) < 0.7:
+        st.warning("⚠️ Answer is Moderately Relevant")
+    else:
+        st.error("🚨 Answer is not Relevant")
+
+def context_relevance(context_relevance_score):
+    st.subheader("Context Relevence Detection")
+    if float(context_relevance_score) > 0.7:
+        st.success("✅ Answer is strongly Relevant to context")
+    elif context_relevance_score > 0.5 and float(context_relevance_score) < 0.7:
+        st.warning("⚠️ Answer is Moderately Relevant to context")
+    elif float(context_relevance_score) == 0.0:
+        st.warning("⚠️ No Context was provided for this response")
+    else:
+        st.error("🚨 Answer is not Relevant to context")
+
+def Neutrality_viz(score):
+    st.subheader("Answer Neutralty Detection")
+    if float(score) > 0.7:
+        st.success("✅ Answer is Neutral")
+    elif float(score) > 0.5 and float(score) < 0.7:
+        st.warning("⚠️ Answer is Moderately Neutral")
+    else:
+        st.error("🚨 Answer is not Neutral")
+
+def answer_relevance(answer_relevance_score):
+    st.subheader("Answer Relevance Detection")
+    if float(answer_relevance_score) > 0.7:
+        st.success("✅ Answer is strongly Relevant")
+    elif float(answer_relevance_score) > 0.5 and float(answer_relevance_score) < 0.7:
+        st.warning("⚠️ Answer is Moderately Relevant")
+    else:
+        st.error("🚨 Answer is not Relevant")
+
+def subjectivity_viz(score):
+    st.subheader("Subjectivity Detection")
+    if float(score) > 0.7:
+        st.success("✅ Answer is strongly Relevant")
+    elif float(score) > 0.5 and float(score) < 0.7:
+        st.warning("⚠️ Answer is Moderately Relevant")
+    else:
+        st.error("🚨 Answer is not Relevant")

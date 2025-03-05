@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="Create Post",
+    page_title="Create moderated Post",
     page_icon="❓",
     layout="wide",
 )
@@ -13,11 +13,9 @@ from utils.embedding_utils import (
 )
 from utils.web_page import fetch_data_from_urls
 from utils.llm_utils import (
-    detect_hallucination, generate_response, groundness_func, answer_relevance_func, 
+    detect_hallucination, generate_moderated_response, generate_response, groundness_func, answer_relevance_func, 
     context_relevance_func, cosine_similarity_func, perplexity_score
 )
-
-
 from utils.analysis_utils import (
     Neutrality_viz, answer_relevance, calculate_toxicity, calculate_sentiment, context_relevance, rouge_score, 
     bias_score_func, detect_pii, visualize_groundness, visualize_toxicity
@@ -42,7 +40,7 @@ if st.session_state.get("answer_generated") and question:
         with st.spinner("Processing... Please wait ⏳"):
             relevant_docs = query_chroma(question, embedding_model)
             context = "\n".join(relevant_docs) if relevant_docs else "No relevant context found."
-            response = generate_response(question, context)
+            response = generate_moderated_response(question, context)
             
             st.subheader("Generated Response")
             st.write(response)
@@ -92,8 +90,8 @@ if st.session_state.get("answer_generated") and question:
             st.write(f"**Toxicity Score:** {toxicity_score}")
             # st.write(f"**Hallucination:** {'No Hallucination' if cosine_similarity_score > 0.4 else 'Hallucinated'}")
             detect_hallucination(question, response)
-            st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")  
-            visualize_groundness(groundness_score)      
+            st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")
+            visualize_groundness(groundness_score)
             st.write(f"**Groundness Score:** {groundness_score}")
             answer_relevance(answer_relevance_score)
             st.write(f"**Answer Relevance Score:** {answer_relevance_score}")
@@ -104,6 +102,6 @@ if st.session_state.get("answer_generated") and question:
             st.write(f"**Subjectivity:** {sentiment_scores['subjectivity']}")
             st.write(f"**Polarity:** {sentiment_scores['polarity']}")
             st.write(f"**PII Detection:** {pii}")
-            st.write(f"**ROUGE Score:** {rouge_scores}")        
+            st.write(f"**ROUGE Score:** {rouge_scores}")  
             st.write(f"**Perplexity Score:** {perplexity_scores}")
-            st.write(f"**Bias Score:** {bias_score}")   
+            st.write(f"**Bias Score:** {bias_score}")
