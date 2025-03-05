@@ -9,6 +9,7 @@ from presidio_analyzer import AnalyzerEngine
 from Dbias.bias_classification import classifier
 import requests
 from sklearn.metrics.pairwise import cosine_similarity
+import evaluate 
 
 @st.cache_resource
 def get_rouge():
@@ -109,6 +110,11 @@ def maxx_toxicity(toxicity_score):
     max_toxicity = max(toxicity_values)
     return max_toxicity
 
+def meteor_score_func(context,response):
+  meteor = evaluate.load('meteor')
+  meteor_score = meteor.compute(predictions=[response], references=[context])
+  return meteor_score
+
 
 def visualize_groundness(groundness_score):
     st.subheader("groundness detection")
@@ -159,9 +165,65 @@ def answer_relevance(answer_relevance_score):
 
 def subjectivity_viz(score):
     st.subheader("Subjectivity Detection")
-    if float(score) > 0.7:
-        st.success("✅ Answer is strongly Relevant")
-    elif float(score) > 0.5 and float(score) < 0.7:
-        st.warning("⚠️ Answer is Moderately Relevant")
+    score = float(score)
+    
+    if score > 0.7:
+        st.success(f"🚨 Highly Subjective: The answer contains strong personal opinions or emotions")
+    elif 0.5 < score <= 0.7:
+        st.warning(f"⚠️ Moderately Subjective: The answer has a mix of opinions and objective statements")
     else:
-        st.error("🚨 Answer is not Relevant")
+        st.error(f"✅ Low Subjectivity: The answer is mostly objective and factual")
+
+def polarity_viz(score):
+    st.subheader("Polarity Detection")
+    score = float(score)
+    
+    if score > 0.5:
+        st.success(f"✅ Positive Sentiment: The answer is positive and optimistic")
+    elif -0.5 <= score <= 0.5:
+        st.warning(f"⚠️ Neutral Sentiment: The answer is balanced or mixed")
+    else:
+        st.error(f"🚨 Negative Sentiment: The answer has a negative or critical tone")
+
+def pii_viz(pii):
+    st.subheader("PII Detection")
+    if pii:
+        st.error("🚨 Personal Identifiable Information Detected:")
+        for entity in pii:
+            st.write(entity)
+    else:
+        st.success("✅ No PII Detected")
+
+def rouge_viz(score):
+    st.subheader("ROUGE Score Analysis")
+    score = float(score)
+    
+    if score > 0.7:
+        st.success(f"✅ High Overlap: The response is highly aligned with the context")
+    elif 0.4 < score <= 0.7:
+        st.warning(f"⚠️ Moderate Overlap: The response partially aligns with the context")
+    else:
+        st.error(f"🚨 Low Overlap: The response has minimal alignment with the context")
+
+
+def meteor_viz(score):
+    st.subheader("Meteor Score based Analysis")
+    score = float(score)
+    
+    if score > 0.5:
+        st.success(f"✅ The response is highly relevant and well-aligned with the reference.")
+    elif 0.2 < score <= 0.5:
+        st.warning(f"⚠️ The response is somewhat relevant but could be improved.")
+    else:
+        st.error(f"🚨 The response is poorly aligned with the reference.")
+
+def perplexity_viz(score):
+    st.subheader("Perplexity Score Analysis")
+    score = float(score)
+    
+    if score < 20:
+        st.success(f"✅ Low Perplexity: The response is highly natural and well-predicted by the model")
+    elif 20 <= score <= 50:
+        st.warning(f"⚠️ Moderate Perplexity: The response is somewhat predictable but could be improved")
+    else:
+        st.error(f"🚨 High Perplexity: The response is difficult for the model to predict, indicating unnatural or confusing text")
