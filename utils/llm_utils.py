@@ -50,6 +50,22 @@ def generate_response(question, context):
     response = ollama.chat(model="mistral", messages=prompt)
     return response["message"]["content"]
 
+def generate_moderated_response(question, context):
+    # prompt = f"Context: {context}\nQuestion: {question}\nAnswer strictly based on the given context."
+    prompt = [
+    {"role": "system", "content": """A user will give you a context, and you must generate a high-quality, engaging social media post strictly based on that context.
+    
+    - **Do not add any information that is not present in the context.**
+    - Ensure that the post is relevant, engaging, and formatted for online posting.
+    - Add **4-6 relevant hashtags** to increase engagement.
+    - Use a **conversational and catchy tone** while maintaining factual accuracy.
+    - If the context is missing or lacks enough information, say **'Sorry, no relevant context provided'** instead of generating a post."""},    
+    {"role": "user", "content": "Context: " + str(context) + " question: " + str(question)}
+    ]
+    # response = ollama.chat(model="mistral", messages=prompt)
+    response = ollama.chat(model="mistral", messages=prompt)
+    return response["message"]["content"]
+
 
 def groundness_func(context, response):
     prompt = [

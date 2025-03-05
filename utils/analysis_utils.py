@@ -22,8 +22,6 @@ def get_sia():
 def get_engine():
     return AnalyzerEngine()
 
-
-
 # rouge = Rouge()
 
 

@@ -1,112 +1,119 @@
 
 import streamlit as st
-# from utils.pdf_utils import extract_text_from_pdf, chunk_text
-# from utils.reddit_utils import fetch_reddit_posts
-# from utils.embedding_utils import load_embedding_model, load_sentence_transformer, add_documents_to_collection, query_chroma
-# from utils.llm_utils import generate_response, groundness_func, answer_relevance_func, context_relevance_func, cosine_similarity_func, perplexity_score,detect_hallucination
-# from utils.analysis_utils import Neutrality_viz, answer_relevance, calculate_toxicity, calculate_sentiment, context_relevance, rouge_score, bias_score_func, detect_pii, visualize_groundness, visualize_toxicity
 
+# Page Configuration
 st.set_page_config(
-    page_title="Responsible AI RAG System",
-    page_icon="🤖",
+    page_title="Your Personal Social Media Assistant",
+    page_icon="🚀",
     layout="wide",
 )
 
-if st.button("Create post"):
-    st.switch_page("pages/create-post.py")
-elif st.button("Data Upload"):
-    st.switch_page("pages/data-upload.py")
-# # main.py
-# import streamlit as st
-# from utils.pdf_utils import extract_text_from_pdf, chunk_text
-# from utils.reddit_utils import fetch_reddit_posts
-# from utils.embedding_utils import load_embedding_model, load_sentence_transformer, add_documents_to_collection, query_chroma
-# from utils.llm_utils import generate_response, groundness_func, answer_relevance_func, context_relevance_func, cosine_similarity_func, perplexity_score
-# from utils.analysis_utils import calculate_toxicity, calculate_sentiment, rouge_score, bias_score_func, detect_pii, visualize_toxicity
+from utils.embedding_utils import (
+    load_embedding_model, 
+    load_sentence_transformer, 
+    add_documents_to_collection,
+    query_chroma
+)
+from utils.web_page import fetch_data_from_urls
+from utils.llm_utils import (
+    detect_hallucination, generate_response, groundness_func, answer_relevance_func, 
+    context_relevance_func, cosine_similarity_func, perplexity_score
+)
+from utils.analysis_utils import (
+    Neutrality_viz, answer_relevance, calculate_toxicity, calculate_sentiment, context_relevance, rouge_score, 
+    bias_score_func, detect_pii, visualize_groundness, visualize_toxicity
+)
+from utils.pdf_utils import extract_text_from_pdf, chunk_text
+from utils.reddit_utils import fetch_reddit_posts
+from utils.embedding_utils import (
+    load_embedding_model, 
+    load_sentence_transformer, 
+    add_documents_to_collection,
+    query_chroma
+)
+from utils.web_page import fetch_data_from_urls
 
-# st.title("Responsible AI RAG System")
 
-# # Initialize cached embedding models
-# embedding_model = load_embedding_model()
-# sentence_model = load_sentence_transformer()
+# Custom CSS for better button alignment
+st.markdown(
+    """
+    <style>
+        /* Center the content */
+        .main-content {
+            max-width: 800px;
+            margin: auto;
+            padding-top: 40px;
+        }
 
-# # Upload Documents or Provide Subreddit Name
-# option = st.radio("Choose Input Type", ["Upload Document", "Enter Subreddit Name"])
+        /* Heading style */
+        .title {
+            font-size: 2.3rem;
+            font-weight: bold;
+        }
 
-# if option == "Upload Document":
-#     uploaded_file = st.file_uploader("Upload a PDF file", type=["pdf"])    
-#     if uploaded_file is not None:
-#         with st.spinner("Processing... Please wait ⏳"):              
-#             raw_text = extract_text_from_pdf(uploaded_file)        
-#             text_chunks = chunk_text(raw_text)
-#             if text_chunks:
-#                 add_documents_to_collection(text_chunks, sentence_model)
-#                 st.success("Document uploaded and stored in ChromaDB!")
-#             else:
-#                 st.error("No text extracted from PDF. Try another document.")
+        /* Subtext */
+        .subtext {
+            font-size: 1.1rem;
+            color: #bbb;
+        }
 
-# elif option == "Enter Subreddit Name":
-#     subreddit_name = st.text_input("Enter Subreddit Name")
-#     if st.button("Fetch Reddit Data"):
-#         with st.spinner("Fetching... Please wait ⏳"):
-#             raw_text = "\n".join(fetch_reddit_posts(subreddit_name, limit=10))
-#             text_chunks = chunk_text(raw_text)
-#             if text_chunks:
-#                 add_documents_to_collection(text_chunks, sentence_model)
-#                 st.success("Reddit posts uploaded and stored in ChromaDB!")
-#             else:
-#                 st.error("No text extracted from Reddit. Try again.")
+        /* Button container - flexbox for better alignment */
+        .button-container {
+            display: flex;
+            justify-content: left;
+            gap: 15px; /* Adjust spacing between buttons */
+            margin-top: 20px;
+        }
 
-# # Initialize session state for answer generation
-# if "answer_generated" not in st.session_state:
-#     st.session_state.answer_generated = False
+        /* Button styling */
+        .stButton button {
+            width: 180px;
+            height: 45px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+        }
 
-# # Query Input
-# st.header("Ask a Question")
-# question = st.text_input("Enter your question")
+        .stButton button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-# if st.button("Get Answer"):
-#     st.session_state.answer_generated = True
+# Main container for content
+with st.container():
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
-# if st.session_state.answer_generated:
-#     with st.spinner("Processing... Please wait ⏳"):
-#         relevant_docs = query_chroma(question, embedding_model)
-#         context = "\n".join(relevant_docs) if relevant_docs else "No relevant context found."
-#         response = generate_response(question, context)
-        
-#         st.subheader("Generated Response")
-#         st.write(response)
-        
-#         # Responsible AI Analysis
-#         toxicity_score = calculate_toxicity(response)
-#         sentiment_scores = calculate_sentiment(response)
-#         groundness_score = groundness_func(context, response)
-#         answer_relevance_score = answer_relevance_func(response, question)
-#         context_relevance_score = context_relevance_func(context, question)
-#         rouge_scores = rouge_score(response, context)
-#         perplexity_scores = perplexity_score(response)
-#         bias_score = bias_score_func(response)
-#         cosine_similarity_score = cosine_similarity_func(question, response)
-#         pii = detect_pii(response)
-        
-#         st.header("Responsible AI Analysis")
-#         visualize_toxicity(toxicity_score)
-#         st.write(f"**Toxicity Score:** {toxicity_score}")
-#         # st.write(f"**Hallucination:** {'No Hallucination' if cosine_similarity_score > 0.4 else 'Hallucinated'}")
-#         detect_hallucination(question, response)
-#         st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")  
-#         visualize_groundness(groundness_score)      
-#         st.write(f"**Groundness Score:** {groundness_score}")
-#         answer_relevance(answer_relevance_score)
-#         st.write(f"**Answer Relevance Score:** {answer_relevance_score}")
-#         context_relevance(context_relevance_score)
-#         st.write(f"**Context Relevance Score:** {context_relevance_score}")
-#         Neutrality_viz(sentiment_scores['neutrality'])
-#         st.write(f"**Neutrality:** {sentiment_scores['neutrality']}")
-#         st.write(f"**Subjectivity:** {sentiment_scores['subjectivity']}")
-#         st.write(f"**Polarity:** {sentiment_scores['polarity']}")
-#         st.write(f"**PII Detection:** {pii}")
-#         st.write(f"**ROUGE Score:** {rouge_scores}")        
-#         st.write(f"**Perplexity Score:** {perplexity_scores}")
-#         st.write(f"**Bias Score:** {bias_score}")
+    # Title
+    st.markdown('<div class="title">🚀 Welcome to Your Personal Social Media Assistant!</div>', unsafe_allow_html=True)
 
+    # Description
+    st.markdown(
+        """
+        <div class="subtext">
+        We’re here to help you create eye-catching, engaging posts in no time.  
+        Whether you're looking to share news, promote a product, or simply interact with your audience, we've got you covered!
+        <br><br>
+        👉 <b>What would you like to do today?</b>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Buttons inside a flexbox container
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+
+    col1, col2 = st.columns([0.2, 0.8])  # Reduce spacing between buttons
+    with col1:
+        if st.button("📤 Upload Data"):
+            st.switch_page("pages/data-upload.py")
+    with col2:
+        if st.button("✍️ Create Post"):
+            st.switch_page("pages/create-post.py")
+
+    st.markdown('</div>', unsafe_allow_html=True)
