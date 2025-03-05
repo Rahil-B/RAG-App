@@ -50,6 +50,26 @@ def generate_response(question, context):
     response = ollama.chat(model="mistral", messages=prompt)
     return response["message"]["content"]
 
+def moderate_response(question, response):
+    """
+    Moderates a toxic response by adjusting the language while maintaining the original intent.
+    If the response is completely inappropriate, it returns 'Cannot respond as against community guidelines.'
+    """
+    moderation_prompt = [
+        {"role": "system", "content": """A user has generated a response that contains **toxic or inappropriate language**.  
+        
+        - Your job is to **moderate** the response to ensure it is **safe, ethical, and appropriate** for public sharing.
+        - **Retain the core message** but remove any harmful, misleading, offensive, or unethical content.
+        - If the response **cannot be moderated** (e.g., promoting violence, hate speech, misinformation), return:  
+          **'Cannot respond as against community guidelines.'**
+        - Ensure the final response is **engaging, neutral, and well-formatted** for social media posts."""},
+        
+        {"role": "user", "content": f"Original Question: {question}\nGenerated Response: {response}\n\nPlease provide a moderated version that adheres to ethical guidelines."}
+    ]
+    
+    moderated_response = ollama.chat(model="mistral", messages=moderation_prompt)
+    return moderated_response["message"]["content"]
+
 def generate_moderated_response(question, context):
     # prompt = f"Context: {context}\nQuestion: {question}\nAnswer strictly based on the given context."
     prompt = [

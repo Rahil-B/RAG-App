@@ -101,6 +101,13 @@ def visualize_toxicity(toxicity_score):
         st.warning("⚠️ Moderate Toxicity")
     else:
         st.error("🚨 High Toxicity")
+    
+        
+def maxx_toxicity(toxicity_score):
+    toxicity_labels = list(toxicity_score.keys())
+    toxicity_values = list(toxicity_score.values())
+    max_toxicity = max(toxicity_values)
+    return max_toxicity
 
 
 def visualize_groundness(groundness_score):
