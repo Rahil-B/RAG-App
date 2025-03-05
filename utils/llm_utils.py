@@ -1,4 +1,5 @@
 # utils/llm_utils.py
+import streamlit as st
 import ollama
 from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -9,10 +10,22 @@ from sklearn.metrics.pairwise import cosine_similarity
 from config import GROQ_API_KEY
 import streamlit as st
 
-# Initialize GPT2 resources (for perplexity)
-tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-model = GPT2LMHeadModel.from_pretrained("gpt2")
+@st.cache_resource
+def get_tokenizer():
+    return GPT2Tokenizer.from_pretrained("gpt2")
 
+@st.cache_resource
+def get_model():
+    return GPT2LMHeadModel.from_pretrained("gpt2")
+
+@st.cache_resource
+def get_model_embed():
+    return SentenceTransformer('all-MiniLM-L6-v2')
+
+# Initialize GPT2 resources (for perplexity)
+tokenizer = get_tokenizer()#GPT2Tokenizer.from_pretrained("gpt2")
+model = get_model()#GPT2LMHeadModel.from_pretrained("gpt2")
+model_embed = get_model_embed()#SentenceTransformer('all-MiniLM-L6-v2')
 # Initialize ChatGroq LLM
 llm = ChatGroq(model="llama3-8b-8192", api_key=GROQ_API_KEY)
 
@@ -70,9 +83,9 @@ a number between 0.0 and 1.0 rounded to two decimal places, with no additional t
     return llm.invoke(prompt).content
 
 def cosine_similarity_func(question, response):
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-    query_embedding = model.encode([question])
-    response_embedding = model.encode([response])
+    
+    query_embedding = model_embed.encode([question])
+    response_embedding = model_embed.encode([response])
     cosine_sim = cosine_similarity(query_embedding, response_embedding)
     return cosine_sim[0][0]
 
