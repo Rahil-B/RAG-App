@@ -87,15 +87,16 @@ if st.session_state.get("answer_generated") and question:
             cosine_similarity_score = cosine_similarity_func(question, response)
             pii = detect_pii(response)
             max_tox = maxx_toxicity(toxicity_score)
+            moderated_response = None
             if(max_tox>0.1):
                    moderated_response = moderate_response(question,response)
             
             st.header("Responsible AI Analysis")
             visualize_toxicity(toxicity_score)
             st.write(f"**Toxicity Score:** {toxicity_score}")
-
-            st.subheader("Moderated Response")
-            st.write(moderated_response)
+            if moderated_response:
+                st.subheader("Moderated Response")
+                st.write(moderated_response)
 
             # st.write(f"**Hallucination:** {'No Hallucination' if cosine_similarity_score > 0.4 else 'Hallucinated'}")
             detect_hallucination(question, response)
