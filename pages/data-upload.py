@@ -47,13 +47,16 @@ elif option == "Fetch Data from URL":
     if st.button("Fetch Data from URLs"):
         with st.spinner("Fetching... Please wait ⏳"):
             docs_list = fetch_data_from_urls(urls)
-            raw_text = "\n".join(docs_list)
-            text_chunks = chunk_text(raw_text)
-            if text_chunks:
-                add_documents_to_collection(text_chunks, sentence_model)
-                st.success("Data from URLs uploaded and stored in ChromaDB!")
+            if not docs_list:
+                st.error("No URLs provided. Try again.")
             else:
-                st.error("No text extracted from URLs. Try again.")
+                raw_text = "\n".join(docs_list)
+                text_chunks = chunk_text(raw_text)
+                if text_chunks:
+                    add_documents_to_collection(text_chunks, sentence_model)
+                    st.success("Data from URLs uploaded and stored in ChromaDB!")
+                else:
+                    st.error("No text extracted from URLs. Try again.")
 
 # Button to go back to "Ask a Question"
 if st.button("Proceed to Ask a Question"):
