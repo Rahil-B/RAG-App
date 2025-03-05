@@ -95,9 +95,9 @@ def visualize_toxicity(toxicity_score):
     # st.pyplot(fig)
 
     max_toxicity = max(toxicity_values)
-    if max_toxicity < 0.05:
+    if max_toxicity < 0.1:
         st.success("✅ Low Toxicity")
-    elif max_toxicity < 0.1:
+    elif max_toxicity < 0.5:
         st.warning("⚠️ Moderate Toxicity")
     else:
         st.error("🚨 High Toxicity")
@@ -125,7 +125,7 @@ def context_relevance(context_relevance_score):
     st.subheader("Context Relevence Detection")
     if float(context_relevance_score) > 0.7:
         st.success("✅ Answer is strongly Relevant to context")
-    elif context_relevance_score > 0.5 and float(context_relevance_score) < 0.7:
+    elif float(context_relevance_score) > 0.5 and float(context_relevance_score) < 0.7:
         st.warning("⚠️ Answer is Moderately Relevant to context")
     elif float(context_relevance_score) == 0.0:
         st.warning("⚠️ No Context was provided for this response")
@@ -148,7 +148,7 @@ def answer_relevance(answer_relevance_score):
     elif float(answer_relevance_score) > 0.5 and float(answer_relevance_score) < 0.7:
         st.warning("⚠️ Answer is Moderately Relevant")
     else:
-        st.error("🚨 Answer is not Relevant")
+        st.error(f"🚨 Answer is not Relevant")
 
 def subjectivity_viz(score):
     st.subheader("Subjectivity Detection")
