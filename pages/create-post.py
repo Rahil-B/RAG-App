@@ -19,7 +19,7 @@ from utils.llm_utils import (
 
 
 from utils.analysis_utils import (
-    Neutrality_viz, answer_relevance, calculate_toxicity, calculate_sentiment, context_relevance, rouge_score, 
+    Neutrality_viz, answer_relevance, calculate_toxicity, calculate_sentiment, context_relevance, maxx_toxicity, rouge_score, 
     bias_score_func, detect_pii, visualize_groundness, visualize_toxicity
 )
 embedding_model = load_embedding_model()
@@ -86,7 +86,8 @@ if st.session_state.get("answer_generated") and question:
             bias_score = bias_score_func(response)
             cosine_similarity_score = cosine_similarity_func(question, response)
             pii = detect_pii(response)
-            if(toxicity_score>0.1):
+            max_tox = maxx_toxicity(toxicity_score)
+            if(max_tox>0.1):
                    moderated_response = moderate_response(question,response)
             
             st.header("Responsible AI Analysis")
