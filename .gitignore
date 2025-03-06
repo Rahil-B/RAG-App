@@ -4,3 +4,4 @@ chroma_db/chroma.sqlite3
 *.bin
 log.txt
 log_query.txt
+chroma_db/
