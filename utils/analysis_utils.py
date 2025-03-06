@@ -207,8 +207,9 @@ def rouge_viz(score):
 
 
 def meteor_viz(score):
+    print("Meteor:",score)
     st.subheader("Meteor Score based Analysis")
-    score = float(score)
+    score = float(score["meteor"])
     
     if score > 0.5:
         st.success(f"✅ The response is highly relevant and well-aligned with the reference.")

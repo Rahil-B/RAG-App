@@ -46,7 +46,14 @@ def generate_response(question, context):
     - If the context is missing or lacks enough information, say **'Sorry, no relevant context provided'** instead of generating a post."""},    
     {"role": "user", "content": "Context: " + str(context) + " question: " + str(question)}
     ]
-    # response = ollama.chat(model="mistral", messages=prompt)
+    # prompt = [
+    # {"role": "system", "content": """A user will give you a context and topic, and you must generate a high-quality, engaging social media post for that topic using the context.
+    
+    # - Ensure that the post is relevant, engaging, and formatted for online posting.
+    # - Add **4-6 relevant hashtags** to increase engagement.
+    # - If the context is missing or lacks enough information, say **'Sorry, no relevant context provided'** instead of generating a post."""},    
+    # {"role": "user", "content": "Context: " + str(context) + " question: " + str(question)}
+    # ]
     response = ollama.chat(model="mistral", messages=prompt)
     return response["message"]["content"]
 

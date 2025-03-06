@@ -44,6 +44,13 @@ if st.session_state.get("answer_generated") and question:
             context = "\n".join(relevant_docs) if relevant_docs else "No relevant context found."
             response = generate_response(question, context)
             
+            # write the context and response in log file
+            with open("log_query.txt", "a") as f:
+                f.write(f"Context: {context}\n")
+                f.write(f"Question: {question}\n")
+                f.write(f"Response: {response}\n\n")
+            
+            
             st.subheader("Generated Response")
             st.write(response)
             
@@ -86,7 +93,7 @@ if st.session_state.get("answer_generated") and question:
             bias_score = bias_score_func(response)
             cosine_similarity_score = cosine_similarity_func(question, response)
             pii = detect_pii(response)
-            meteor_score = meteor_score_func(context,response) 
+            meteor_score = meteor_score_func(context,response)
             max_tox = maxx_toxicity(toxicity_score)
             moderated_response = None
             if(max_tox>0.1):
@@ -107,8 +114,8 @@ if st.session_state.get("answer_generated") and question:
             st.write(f"**Groundness Score:** {groundness_score}")
             answer_relevance(answer_relevance_score)
             st.write(f"**Answer Relevance Score:** {answer_relevance_score}")
-            context_relevance(context_relevance_score)
-            st.write(f"**Context Relevance Score:** {context_relevance_score}")
+            # context_relevance(context_relevance_score)
+            # st.write(f"**Context Relevance Score:** {context_relevance_score}")
             Neutrality_viz(sentiment_scores['neutrality'])
             st.write(f"**Neutrality:** {sentiment_scores['neutrality']}")
             subjectivity_viz(sentiment_scores['subjectivity'])

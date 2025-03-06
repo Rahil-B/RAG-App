@@ -2,3 +2,5 @@ web_content_log.txt
 *.pyc
 chroma_db/chroma.sqlite3
 *.bin
+log.txt
+log_query.txt

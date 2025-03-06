@@ -28,10 +28,10 @@ def add_documents_to_collection(text_chunks, sentence_model):
     ids = [str(idx) for idx in range(len(text_chunks))]
     collection.add(ids=ids, documents=text_chunks, embeddings=embeddings)
 
-def query_chroma(query, embedding_model, threshold=0.5):
+def query_chroma(query, embedding_model, threshold=0.7):
     collection = get_chroma_collection()
     query_embedding = embedding_model.embed_query(query)
-    results = collection.query(query_embeddings=[query_embedding], n_results=5)
+    results = collection.query(query_embeddings=[query_embedding], n_results=10)
     
     if not results['documents'][0]:
         return None
