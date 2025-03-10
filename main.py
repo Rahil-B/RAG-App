@@ -9,7 +9,6 @@ st.set_page_config(
 )
 from utils.embedding_utils import (
     load_embedding_model, 
-    load_sentence_transformer, 
     add_documents_to_collection,
     query_chroma
 )
@@ -26,20 +25,9 @@ from utils.analysis_utils import (
 )
 from utils.pdf_utils import extract_text_from_pdf, chunk_text
 from utils.reddit_utils import fetch_reddit_posts
-from utils.embedding_utils import (
-    load_embedding_model, 
-    load_sentence_transformer, 
-    add_documents_to_collection,
-    query_chroma
-)
+
 from utils.web_page import fetch_data_from_urls
 
-from utils.embedding_utils import (
-    load_embedding_model, 
-    load_sentence_transformer, 
-    add_documents_to_collection,
-    query_chroma
-)
 from utils.web_page import fetch_data_from_urls
 from utils.llm_utils import (
     detect_hallucination, generate_response, groundness_func, answer_relevance_func, 
@@ -51,12 +39,7 @@ from utils.analysis_utils import (
 )
 from utils.pdf_utils import extract_text_from_pdf, chunk_text
 from utils.reddit_utils import fetch_reddit_posts
-from utils.embedding_utils import (
-    load_embedding_model, 
-    load_sentence_transformer, 
-    add_documents_to_collection,
-    query_chroma
-)
+
 from utils.web_page import fetch_data_from_urls
 
 

@@ -206,6 +206,8 @@ def visualize_groundness(groundness_score):
 
     if float(groundness_score) > 0.7:
         st.success("✅ Grounded")
+    elif float(groundness_score) > 0.3 and float(groundness_score) < 0.7:
+        st.warning("⚠️ Moderately Grounded")
     elif float(groundness_score)  == 0.0:
         st.warning("⚠️ No Context was provided for this response")
     else:
@@ -280,11 +282,11 @@ def subjectivity_viz(score):
     score = float(score)
     
     if score > 0.7:
-        st.success(f"🚨 Highly Subjective: The answer contains strong personal opinions or emotions")
+        st.error(f"🚨 Highly Subjective: The answer contains strong personal opinions or emotions")
     elif 0.5 < score <= 0.7:
         st.warning(f"⚠️ Moderately Subjective: The answer has a mix of opinions and objective statements")
     else:
-        st.error(f"✅ Low Subjectivity: The answer is mostly objective and factual")
+        st.success(f"✅ Low Subjectivity: The answer is mostly objective and factual")
 
 def polarity_viz(score):
     # st.subheader("Polarity Detection")
@@ -297,9 +299,9 @@ def polarity_viz(score):
     if score > 0.5:
         st.success(f"✅ Positive Sentiment: The answer is positive and optimistic")
     elif -0.5 <= score <= 0.5:
-        st.warning(f"⚠️ Neutral Sentiment: The answer is balanced or mixed")
+        st.success(f"⚠️ Neutral Sentiment: The answer is balanced or mixed")
     else:
-        st.error(f"🚨 Negative Sentiment: The answer has a negative or critical tone")
+        st.warning(f"🚨 Negative Sentiment: The answer has a negative or critical tone")
 
 def pii_viz(pii):
     # st.subheader("PII Detection")
@@ -324,9 +326,9 @@ def rouge_viz(score):
     
     score = float(score)
     
-    if score > 0.7:
+    if score > 0.5:
         st.success(f"✅ High Overlap: The response is highly aligned with the context")
-    elif 0.4 < score <= 0.7:
+    elif 0.3 < score <= 0.5:
         st.warning(f"⚠️ Moderate Overlap: The response partially aligns with the context")
     else:
         st.error(f"🚨 Low Overlap: The response has minimal alignment with the context")
@@ -356,9 +358,9 @@ def perplexity_viz(score):
     
     score = float(score)
     
-    if score < 20:
+    if score < 30:
         st.success(f"✅ Low Perplexity: The response is highly natural and well-predicted by the model")
-    elif 20 <= score <= 50:
+    elif 30 <= score <= 60:
         st.warning(f"⚠️ Moderate Perplexity: The response is somewhat predictable but could be improved")
     else:
         st.error(f"🚨 High Perplexity: The response is difficult for the model to predict, indicating unnatural or confusing text")

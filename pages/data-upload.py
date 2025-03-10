@@ -8,12 +8,10 @@ from utils.pdf_utils import extract_text_from_pdf, chunk_text
 from utils.reddit_utils import fetch_reddit_posts
 from utils.embedding_utils import (
     load_embedding_model, 
-    load_sentence_transformer, 
     add_documents_to_collection,
     query_chroma
 )
 from utils.web_page import fetch_data_from_urls
-sentence_model = load_sentence_transformer()
 st.header("Data Upload")
 # option = st.radio("Choose Input Type", ["Upload Document", "Fetch Data from Reddit", "Fetch Data from URL"])
 
@@ -68,7 +66,7 @@ with st.expander("Upload Document"):
                 raw_text = extract_text_from_pdf(uploaded_file)
                 text_chunks = chunk_text(raw_text)
                 if text_chunks:
-                    add_documents_to_collection(text_chunks, sentence_model)
+                    add_documents_to_collection(text_chunks)#, sentence_model)
                     st.success(f"Document {uploaded_file.name} uploaded and stored in ChromaDB!")
                 else:
                     st.error(f"No text extracted from {uploaded_file.name}. Try another document.")
@@ -80,7 +78,7 @@ with st.expander("Fetch Data from Reddit"):
             raw_text = "\n".join(fetch_reddit_posts(subreddit_name, limit=10))
             text_chunks = chunk_text(raw_text)
             if text_chunks:
-                add_documents_to_collection(text_chunks, sentence_model)
+                add_documents_to_collection(text_chunks)#, sentence_model)
                 st.success("Reddit posts uploaded and stored in ChromaDB!")
             else:
                 st.error("No text extracted from Reddit. Try again.")
@@ -97,7 +95,7 @@ with st.expander("Fetch Data from URL"):
                 raw_text = "\n".join(docs_list)
                 text_chunks = chunk_text(raw_text)
                 if text_chunks:
-                    add_documents_to_collection(text_chunks, sentence_model)
+                    add_documents_to_collection(text_chunks)#, sentence_model)
                     st.success("Data from URLs uploaded and stored in ChromaDB!")
                 else:
                     st.error("No text extracted from URLs. Try again.")

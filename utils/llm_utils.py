@@ -71,7 +71,7 @@ def get_model():
 
 @st.cache_resource
 def get_model_embed():
-    return SentenceTransformer('all-MiniLM-L6-v2')
+    return SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")#SentenceTransformer('all-MiniLM-L6-v2')
 
 # Initialize GPT2 resources (for perplexity)
 tokenizer = get_tokenizer()#GPT2Tokenizer.from_pretrained("gpt2")
