@@ -43,6 +43,7 @@ if st.session_state.get("answer_generated") and question:
             relevant_docs = query_chroma(question, embedding_model)
             context = "\n".join(relevant_docs) if relevant_docs else "No relevant context found."
             response = generate_response(question, context)
+            # response = "this is a test response"
             
             # write the context and response in log file
             with open("log_query.txt", "a") as f:
@@ -51,37 +52,13 @@ if st.session_state.get("answer_generated") and question:
                 f.write(f"Response: {response}\n\n")
             
             
-            st.subheader("Generated Response")
-            st.write(response)
+            # st.subheader("Generated Response")
+            # st.write(response)
+            # 📌 Keep Response Always Visible
+            st.header("Generated Response")
+            st.success(response)  # ✅ Keeps response on top in a highlighted box
             
-            # # Responsible AI Analysis
-            # toxicity_score = calculate_toxicity(response)
-            # sentiment_scores = calculate_sentiment(response)
-            # groundness_score = groundness_func(context, response)
-            # answer_relevance_score = answer_relevance_func(response, question)
-            # context_relevance_score = context_relevance_func(context, question)
-            # rouge_scores = rouge_score(response, context)
-            # perplexity_scores = perplexity_score(response)
-            # bias_score = bias_score_func(response)
-            # cosine_similarity_score = cosine_similarity_func(question, response)
-            # pii = detect_pii(response)
-            
-            # st.subheader("Responsible AI Analysis")
-            # visualize_toxicity(toxicity_score)
-            # st.write(f"**Toxicity Score:** {toxicity_score}")
-            # st.write(f"**Hallucination:** {'No Hallucination' if cosine_similarity_score > 0.4 else 'Hallucinated'}")
-            # st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")        
-            # st.write(f"**Groundness Score:** {groundness_score}")
-            # st.write(f"**Answer Relevance Score:** {answer_relevance_score}")
-            # st.write(f"**Context Relevance Score:** {context_relevance_score}")
-            # st.write(f"**Neutrality:** {sentiment_scores.get('neutrality', 'N/A')}")
-            # st.write(f"**Subjectivity:** {sentiment_scores.get('subjectivity', 'N/A')}")
-            # st.write(f"**Polarity:** {sentiment_scores.get('polarity', 'N/A')}")
-            # st.write(f"**PII Detection:** {pii}")
-            # st.write(f"**ROUGE Score:** {rouge_scores}")        
-            # st.write(f"**Perplexity Score:** {perplexity_scores}")
-            # st.write(f"**Bias Score:** {bias_score}")
-
+           
             # Responsible AI Analysis
             toxicity_score = calculate_toxicity(response)
             sentiment_scores = calculate_sentiment(response)
@@ -99,36 +76,132 @@ if st.session_state.get("answer_generated") and question:
             if(max_tox>0.1):
                    moderated_response = moderate_response(question,response)
             
-            st.header("Responsible AI Analysis")
-            visualize_toxicity(toxicity_score)
-            st.write(f"**Toxicity Score:** {toxicity_score}")
+            if moderated_response:
+                toxicity_score2 = calculate_toxicity(moderated_response)
+                sentiment_scores2 = calculate_sentiment(moderated_response)
+                groundness_score2 = groundness_func(context, moderated_response)
+                answer_relevance_score2 = answer_relevance_func(moderated_response, question)
+                context_relevance_score2 = context_relevance_func(context, question)
+                rouge_scores2 = rouge_score(moderated_response, context)
+                perplexity_scores2 = perplexity_score(moderated_response)
+                bias_score2 = bias_score_func(moderated_response)
+                cosine_similarity_score2 = cosine_similarity_func(question, moderated_response)
+                pii2 = detect_pii(moderated_response)
+                meteor_score2 = meteor_score_func(context,moderated_response)
+            
+            
+            
+
+            if moderated_response:
+                st.subheader("Moderated Response")
+                st.success(moderated_response)
+            # st.header("Responsible AI Analysis")
+            # visualize_toxicity(toxicity_score)
+            # st.write(f"**Toxicity Score:** {toxicity_score}")
             # work in progress ----------
             # if moderated_response:
             #     st.subheader("Moderated Response")
             #     st.write(moderated_response)
 
-            # st.write(f"**Hallucination:** {'No Hallucination' if cosine_similarity_score > 0.4 else 'Hallucinated'}")
-            detect_hallucination(question, response)
-            st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")  
-            visualize_groundness(groundness_score)      
-            st.write(f"**Groundness Score:** {groundness_score}")
-            answer_relevance(answer_relevance_score)
-            st.write(f"**Answer Relevance Score:** {answer_relevance_score}")
-            # context_relevance(context_relevance_score)
-            # st.write(f"**Context Relevance Score:** {context_relevance_score}")
-            Neutrality_viz(sentiment_scores['neutrality'])
-            st.write(f"**Neutrality:** {sentiment_scores['neutrality']}")
-            subjectivity_viz(sentiment_scores['subjectivity'])
-            st.write(f"**Subjectivity:** {sentiment_scores['subjectivity']}")
-            polarity_viz(sentiment_scores['polarity'])            
-            st.write(f"**Polarity:** {sentiment_scores['polarity']}")
-            pii_viz(pii)
-            st.write(f"**PII Detection:** {pii}")
-            rouge_viz(rouge_scores)
-            st.write(f"**ROUGE Score:** {rouge_scores}")     
-            perplexity_viz(perplexity_scores)   
-            st.write(f"**Perplexity Score:** {perplexity_scores}")
-            # st.write(f"**Bias Score:** {bias_score}") 
-            meteor_viz(meteor_score) 
-            st.write(f"**Meteor Score:** {meteor_score}")
+            # detect_hallucination(question, response)
+            # st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")  
+            # pii_viz(pii)
+            # st.write(f"**PII Detection:** {pii}")
+            # visualize_groundness(groundness_score)      
+            # st.write(f"**Groundness Score:** {groundness_score}")
+            # answer_relevance(answer_relevance_score)
+            # st.write(f"**Answer Relevance Score:** {answer_relevance_score}")
+            # # context_relevance(context_relevance_score)
+            # # st.write(f"**Context Relevance Score:** {context_relevance_score}")
+            # Neutrality_viz(sentiment_scores['neutrality'])
+            # st.write(f"**Neutrality:** {sentiment_scores['neutrality']}")
+            # subjectivity_viz(sentiment_scores['subjectivity'])
+            # st.write(f"**Subjectivity:** {sentiment_scores['subjectivity']}")
+            # polarity_viz(sentiment_scores['polarity'])            
+            # st.write(f"**Polarity:** {sentiment_scores['polarity']}")            
+            # rouge_viz(rouge_scores)
+            # st.write(f"**ROUGE Score:** {rouge_scores}")               
+            # # st.write(f"**Bias Score:** {bias_score}") 
+            # meteor_viz(meteor_score) 
+            # st.write(f"**Meteor Score:** {meteor_score['meteor']}")
+            # perplexity_viz(perplexity_scores)
+            # st.write(f"**Perplexity Score:** {perplexity_scores}")
+
+            
+            # 📌 Use Expander for Scrollable Analysis
+            st.header("Responsible AI Analysis")
+
+            with st.expander("📊 View Analysis Results", expanded=False):
+                # --- Analysis Results ---
+                visualize_toxicity(toxicity_score)
+                # st.write(f"**Toxicity Score:** {toxicity_score}")
+
+                detect_hallucination(question, response)
+                st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")
+
+                pii_viz(pii)
+                st.write(f"**PII Detection:** {pii}")
+
+                visualize_groundness(groundness_score)
+                st.write(f"**Groundness Score:** {groundness_score}")
+
+                answer_relevance(answer_relevance_score)
+                st.write(f"**Answer Relevance Score:** {answer_relevance_score}")
+
+                Neutrality_viz(sentiment_scores['neutrality'])
+                st.write(f"**Neutrality:** {sentiment_scores['neutrality']}")
+
+                subjectivity_viz(sentiment_scores['subjectivity'])
+                st.write(f"**Subjectivity:** {sentiment_scores['subjectivity']}")
+
+                polarity_viz(sentiment_scores['polarity'])
+                st.write(f"**Polarity:** {sentiment_scores['polarity']}")                
+
+                rouge_viz(rouge_scores)
+                st.write(f"**ROUGE Score:** {rouge_scores}")
+                
+                meteor_viz(meteor_score)
+                st.write(f"**Meteor Score:** {meteor_score}")
+
+                perplexity_viz(perplexity_scores)
+                st.write(f"**Perplexity Score:** {perplexity_scores}")
+
+            if moderated_response:
+                    # 📌 Use Expander for Scrollable Analysis
+                    st.header("Responsible AI Analysis for a Moderated Response")
+
+                    with st.expander("📊 View Analysis Results", expanded=False):
+                        # --- Analysis Results ---
+                        visualize_toxicity(toxicity_score2)
+                        # st.write(f"**Toxicity Score:** {toxicity_score}")
+
+                        detect_hallucination(question, moderated_response)
+                        st.write(f"**Cosine Similarity Score:** {cosine_similarity_score2}")
+
+                        pii_viz(pii)
+                        st.write(f"**PII Detection:** {pii2}")
+
+                        visualize_groundness(groundness_score2)
+                        st.write(f"**Groundness Score:** {groundness_score2}")
+
+                        answer_relevance(answer_relevance_score2)
+                        st.write(f"**Answer Relevance Score:** {answer_relevance_score2}")
+
+                        Neutrality_viz(sentiment_scores2['neutrality'])
+                        st.write(f"**Neutrality:** {sentiment_scores2['neutrality']}")
+
+                        subjectivity_viz(sentiment_scores2['subjectivity'])
+                        st.write(f"**Subjectivity:** {sentiment_scores2['subjectivity']}")
+
+                        polarity_viz(sentiment_scores2['polarity'])
+                        st.write(f"**Polarity:** {sentiment_scores2['polarity']}")                
+
+                        rouge_viz(rouge_scores2)
+                        st.write(f"**ROUGE Score:** {rouge_scores2}")
+                        
+                        meteor_viz(meteor_score2)
+                        st.write(f"**Meteor Score:** {meteor_score2}")
+
+                        perplexity_viz(perplexity_scores2)
+                        st.write(f"**Perplexity Score:** {perplexity_scores2}")
             

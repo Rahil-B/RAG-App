@@ -10,6 +10,71 @@ from Dbias.bias_classification import classifier
 import requests
 from sklearn.metrics.pairwise import cosine_similarity
 import evaluate 
+import pandas as pd
+
+# 🔹 Tooltip Descriptions
+groundness_tooltip_text = "Indicates whether the response is based on provided context. Higher scores mean more grounded responses."
+answer_relevance_tooltip_text = "Measures how well the response answers the given question. Higher scores indicate better relevance."
+context_relevance_tooltip_text = "Evaluates how relevant the context is to the response. A score of 0 means no context was provided."
+neutrality_tooltip_text = "Determines whether the response maintains a neutral tone. Higher scores indicate less bias."
+subjectivity_tooltip_text = "Indicates whether the response contains personal opinions or is objective."
+polarity_tooltip_text = "Analyzes sentiment polarity. Positive values indicate optimism, negative values indicate criticism."
+pii_tooltip_text = "Detects Personal Identifiable Information (PII) in the response."
+rouge_tooltip_text = "Measures the overlap between the response and the context. Higher scores indicate better alignment."
+meteor_tooltip_text = "Evaluates the relevance of the response to the reference text. Higher scores indicate better alignment."
+perplexity_tooltip_text = "Measures how well the response is predicted by the language model. Lower scores indicate more natural text."
+toxicity_tooltip_text = "Analyzes the toxicity of the response, measuring offensive language, threats, and hate speech."
+polarity_tooltip_text = "Analyzes the sentiment of the response. Positive values indicate optimism, negative values indicate criticism."
+
+
+
+# 🔹 Inject Global CSS (Once)
+st.markdown(
+    """
+    <style>
+    /* Tooltip Styling */
+    .tooltip {
+        position: relative;
+        display: inline-flex;  /* Align inline with text */
+        cursor: pointer;
+        margin-left: 10px;  /* Add spacing between heading and ℹ️ */
+        font-size: 18px;  /* Make the ℹ️ icon larger */
+        font-weight: bold;
+    }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 230px;
+        background-color: #1e1e1e;
+        color: #fff;
+        text-align: center;
+        padding: 6px;
+        border-radius: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -115px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 13px;
+    }
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# 🔹 Tooltip Function (Now Properly Spaced & Bigger)
+def add_tooltip(text):
+    """Returns an inline tooltip wrapped around an enlarged ℹ️ icon."""
+    return f"""
+    <span class="tooltip"> ℹ️
+        <span class="tooltiptext">{text}</span>
+    </span>
+    """
 
 @st.cache_resource
 def get_rouge():
@@ -88,14 +153,30 @@ def visualize_toxicity(toxicity_score):
     toxicity_labels = list(toxicity_score.keys())
     toxicity_values = list(toxicity_score.values())
 
-    st.subheader("Toxicity Score Visualization")
+    # st.subheader("Toxicity Score Visualization")
+
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Toxicity Score Visualization {add_tooltip(toxicity_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+
     # fig, ax = plt.subplots()
     # ax.barh(toxicity_labels, toxicity_values, color=['green', 'yellow', 'orange', 'red', 'gray'])
     # ax.set_xlabel("Toxicity Level")
     # ax.set_title("Toxicity Analysis")
     # st.pyplot(fig)
 
-    max_toxicity = max(toxicity_values)
+    
+    # Toxicity Level Analysis
+    max_toxicity = max(toxicity_score.values())
+
+    # Create DataFrame (2 Rows)
+    df = pd.DataFrame([toxicity_values], columns=toxicity_labels)
+    df.index = [""]
+    # Display Table
+    st.table(df) 
+
+    # max_toxicity = max(toxicity_values)
     if max_toxicity < 0.1:
         st.success("✅ Low Toxicity")
     elif max_toxicity < 0.5:
@@ -117,7 +198,12 @@ def meteor_score_func(context,response):
 
 
 def visualize_groundness(groundness_score):
-    st.subheader("groundness detection")
+    # st.subheader("groundness detection")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Groundness Detection {add_tooltip(groundness_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+
     if float(groundness_score) > 0.7:
         st.success("✅ Grounded")
     elif float(groundness_score)  == 0.0:
@@ -126,7 +212,13 @@ def visualize_groundness(groundness_score):
         st.error("🚨 Ungrounded")
 
 def answer_relevance(answer_relevance_score):
-    st.subheader("Answer Relevance Detection")
+    # st.subheader("Answer Relevance Detection")
+
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Answer Relevance Detection {add_tooltip(answer_relevance_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+
     if float(answer_relevance_score) > 0.7:
         st.success("✅ Answer is strongly Relevant")
     elif float(answer_relevance_score) > 0.5 and float(answer_relevance_score) < 0.7:
@@ -135,7 +227,12 @@ def answer_relevance(answer_relevance_score):
         st.error("🚨 Answer is not Relevant")
 
 def context_relevance(context_relevance_score):
-    st.subheader("Context Relevence Detection")
+    # st.subheader("Context Relevence Detection")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Context Relevance Detection {add_tooltip(context_relevance_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+
     if float(context_relevance_score) > 0.7:
         st.success("✅ Answer is strongly Relevant to context")
     elif float(context_relevance_score) > 0.5 and float(context_relevance_score) < 0.7:
@@ -146,7 +243,12 @@ def context_relevance(context_relevance_score):
         st.error("🚨 Answer is not Relevant to context")
 
 def Neutrality_viz(score):
-    st.subheader("Answer Neutralty Detection")
+    # st.subheader("Answer Neutralty Detection")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Answer Neutrality Detection {add_tooltip(neutrality_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+
     if float(score) > 0.7:
         st.success("✅ Answer is Neutral")
     elif float(score) > 0.5 and float(score) < 0.7:
@@ -155,7 +257,12 @@ def Neutrality_viz(score):
         st.error("🚨 Answer is not Neutral")
 
 def answer_relevance(answer_relevance_score):
-    st.subheader("Answer Relevance Detection")
+    # st.subheader("Answer Relevance Detection")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Answer Relevance Detection {add_tooltip(answer_relevance_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+
     if float(answer_relevance_score) > 0.7:
         st.success("✅ Answer is strongly Relevant")
     elif float(answer_relevance_score) > 0.5 and float(answer_relevance_score) < 0.7:
@@ -164,7 +271,12 @@ def answer_relevance(answer_relevance_score):
         st.error(f"🚨 Answer is not Relevant")
 
 def subjectivity_viz(score):
-    st.subheader("Subjectivity Detection")
+    # st.subheader("Subjectivity Detection")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Subjectivity Detection {add_tooltip(subjectivity_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+
     score = float(score)
     
     if score > 0.7:
@@ -175,7 +287,11 @@ def subjectivity_viz(score):
         st.error(f"✅ Low Subjectivity: The answer is mostly objective and factual")
 
 def polarity_viz(score):
-    st.subheader("Polarity Detection")
+    # st.subheader("Polarity Detection")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Polarity Detection {add_tooltip(polarity_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
     score = float(score)
     
     if score > 0.5:
@@ -186,7 +302,12 @@ def polarity_viz(score):
         st.error(f"🚨 Negative Sentiment: The answer has a negative or critical tone")
 
 def pii_viz(pii):
-    st.subheader("PII Detection")
+    # st.subheader("PII Detection")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">PII Detection {add_tooltip(pii_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+
     if pii:
         st.error("🚨 Personal Identifiable Information Detected:")
         for entity in pii:
@@ -195,7 +316,12 @@ def pii_viz(pii):
         st.success("✅ No PII Detected")
 
 def rouge_viz(score):
-    st.subheader("ROUGE Score Analysis")
+    # st.subheader("ROUGE Score Analysis")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">ROUGE Score Analysis {add_tooltip(rouge_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+    
     score = float(score)
     
     if score > 0.7:
@@ -207,8 +333,11 @@ def rouge_viz(score):
 
 
 def meteor_viz(score):
-    print("Meteor:",score)
-    st.subheader("Meteor Score based Analysis")
+    # st.subheader("Meteor Score based Analysis")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Meteor Score Analysis {add_tooltip(meteor_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
     score = float(score["meteor"])
     
     if score > 0.5:
@@ -219,7 +348,12 @@ def meteor_viz(score):
         st.error(f"🚨 The response is poorly aligned with the reference.")
 
 def perplexity_viz(score):
-    st.subheader("Perplexity Score Analysis")
+    # st.subheader("Perplexity Score Analysis")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Perplexity Score Analysis {add_tooltip(perplexity_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+    
     score = float(score)
     
     if score < 20:
