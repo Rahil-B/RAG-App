@@ -7,7 +7,6 @@ st.set_page_config(
 )
 from utils.embedding_utils import (
     load_embedding_model, 
-    load_sentence_transformer, 
     add_documents_to_collection,
     query_chroma
 )
@@ -22,7 +21,7 @@ from utils.analysis_utils import (
     Neutrality_viz, answer_relevance, calculate_toxicity, calculate_sentiment, context_relevance, maxx_toxicity, meteor_score_func, meteor_viz, perplexity_viz, pii_viz, polarity_viz, rouge_score, 
     bias_score_func, detect_pii, rouge_viz, subjectivity_viz, visualize_groundness, visualize_toxicity
 )
-embedding_model = load_embedding_model()
+
 
 # st.header("Data Check")
 # has_data = st.radio("Do you have any data you wish to upload?", ["No", "Yes"])
@@ -40,7 +39,7 @@ if st.button("Get Answer"):
 
 if st.session_state.get("answer_generated") and question:
         with st.spinner("Processing... Please wait ⏳"):
-            relevant_docs = query_chroma(question, embedding_model)
+            relevant_docs = query_chroma(question)
             context = "\n".join(relevant_docs) if relevant_docs else "No relevant context found."
             response = generate_response(question, context)
             # response = "this is a test response"

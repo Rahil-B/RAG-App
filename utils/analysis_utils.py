@@ -206,6 +206,8 @@ def visualize_groundness(groundness_score):
 
     if float(groundness_score) > 0.7:
         st.success("✅ Grounded")
+    elif float(groundness_score) > 0.3 and float(groundness_score) < 0.7:
+        st.warning("⚠️ Moderately Grounded")
     elif float(groundness_score)  == 0.0:
         st.warning("⚠️ No Context was provided for this response")
     else:
