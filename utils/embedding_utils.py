@@ -31,7 +31,7 @@ def add_documents_to_collection(text_chunks):
 def query_chroma(query, threshold=0.7):
     collection = get_chroma_collection()
     query_embedding = embedding_model.embed_query(query)
-    results = collection.query(query_embeddings=[query_embedding], n_results=5)
+    results = collection.query(query_embeddings=[query_embedding], n_results=15)
 
     
     if not results['documents'][0]:
