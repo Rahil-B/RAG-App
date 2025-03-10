@@ -10,6 +10,57 @@ from sklearn.metrics.pairwise import cosine_similarity
 from config import GROQ_API_KEY
 import streamlit as st
 
+
+hallucination_tooltip_text = "Detects hallucinations by comparing the generated response with the original question. Higher similarity means more factual accuracy."
+
+# 🔹 Inject Global CSS (Once)
+st.markdown(
+    """
+    <style>
+    /* Tooltip Styling */
+    .tooltip {
+        position: relative;
+        display: inline-flex;  /* Align inline with text */
+        cursor: pointer;
+        margin-left: 10px;  /* Add spacing between heading and ℹ️ */
+        font-size: 18px;  /* Make the ℹ️ icon larger */
+        font-weight: bold;
+    }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 230px;
+        background-color: #1e1e1e;
+        color: #fff;
+        text-align: center;
+        padding: 6px;
+        border-radius: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -115px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 13px;
+    }
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# 🔹 Tooltip Function (Now Properly Spaced & Bigger)
+def add_tooltip(text):
+    """Returns an inline tooltip wrapped around an enlarged ℹ️ icon."""
+    return f"""
+    <span class="tooltip"> ℹ️
+        <span class="tooltiptext">{text}</span>
+    </span>
+    """
+
 @st.cache_resource
 def get_tokenizer():
     return GPT2Tokenizer.from_pretrained("gpt2")
@@ -133,7 +184,12 @@ def cosine_similarity_func(question, response):
     return cosine_sim[0][0]
 
 def detect_hallucination(question, response):
-    st.subheader("hallucinations detection")
+    # st.subheader("hallucinations detection")
+    st.markdown(
+        f"""<h3 style="display: inline-flex; align-items: center;">Hallucination Detection {add_tooltip(hallucination_tooltip_text)}</h3>""",
+        unsafe_allow_html=True
+    )
+
     cosine_sim_score = cosine_similarity_func(question, response)
     if cosine_sim_score > 0.4:
         st.success("✅ No Hallucination")
