@@ -139,7 +139,7 @@ if st.session_state.get("answer_generated") and question:
                 st.write(f"**Cosine Similarity Score:** {cosine_similarity_score}")
 
                 pii_viz(pii)
-                st.write(f"**PII Detection:** {pii}")
+                # st.write(f"**PII Detection:** {pii}")
 
                 visualize_groundness(groundness_score)
                 st.write(f"**Groundness Score:** {groundness_score}")
@@ -157,10 +157,10 @@ if st.session_state.get("answer_generated") and question:
                 st.write(f"**Polarity:** {sentiment_scores['polarity']}")                
 
                 rouge_viz(rouge_scores)
-                st.write(f"**ROUGE Score:** {rouge_scores}")
+                # st.write(f"**ROUGE Score:** {rouge_scores}")
                 
                 meteor_viz(meteor_score)
-                st.write(f"**Meteor Score:** {meteor_score}")
+                # st.write(f"**Meteor Score:** {meteor_score}")
 
                 perplexity_viz(perplexity_scores)
                 st.write(f"**Perplexity Score:** {perplexity_scores}")
@@ -178,7 +178,7 @@ if st.session_state.get("answer_generated") and question:
                         st.write(f"**Cosine Similarity Score:** {cosine_similarity_score2}")
 
                         pii_viz(pii)
-                        st.write(f"**PII Detection:** {pii2}")
+                        # st.write(f"**PII Detection:** {pii2}")
 
                         visualize_groundness(groundness_score2)
                         st.write(f"**Groundness Score:** {groundness_score2}")
@@ -196,10 +196,10 @@ if st.session_state.get("answer_generated") and question:
                         st.write(f"**Polarity:** {sentiment_scores2['polarity']}")                
 
                         rouge_viz(rouge_scores2)
-                        st.write(f"**ROUGE Score:** {rouge_scores2}")
+                        # st.write(f"**ROUGE Score:** {rouge_scores2}")
                         
                         meteor_viz(meteor_score2)
-                        st.write(f"**Meteor Score:** {meteor_score2}")
+                        # st.write(f"**Meteor Score:** {meteor_score2}")
 
                         perplexity_viz(perplexity_scores2)
                         st.write(f"**Perplexity Score:** {perplexity_scores2}")

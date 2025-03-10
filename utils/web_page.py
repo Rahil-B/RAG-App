@@ -1,7 +1,8 @@
 from langchain_community.document_loaders import WebBaseLoader
-
+import re
 def fetch_data_from_urls(urls):
     docs = []
+    
     for url in urls:
         if isinstance(url, str) and url.strip():
             try:
@@ -15,7 +16,7 @@ def fetch_data_from_urls(urls):
     if not docs:
         return []
     # docs = [WebBaseLoader(url).load() for url in urls if type(url)!=str and url.strip() != ""]
-    docs_list = [item.page_content  for item in docs]
+    docs_list = [re.sub(r'\s+', ' ', item.page_content)  for item in docs]
     # clear log file and then loade data to a log file
     with open("web_content_log.txt", "w") as f:
         for item in docs_list:
